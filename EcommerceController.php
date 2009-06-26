@@ -26,8 +26,8 @@ class EcommerceController extends PluginController {
 	
 	public function __construct() {
 		$this->setLayout('backend');
-        $this->assignToLayout('sidebar', new View('../../plugins/ecommerce/views/sidebar'));
-    }
+		$this->assignToLayout('sidebar', new View('../../plugins/ecommerce/views/sidebar'));
+	}
 	
 	public function index() {
 		$this->dashboard();
@@ -36,18 +36,18 @@ class EcommerceController extends PluginController {
 	/**
 	 * Dashboard
 	 */
-    public function dashboard() {
-    	global $__FROG_CONN__;
-    	
+	public function dashboard() {
+		global $__FROG_CONN__;
+		
 		$sql = 'select l.message, l.created_on, u.name from ecommerce_log l left join user u on u.id = l.user_id order by created_on desc limit 20';
 		$stmt = $__FROG_CONN__->prepare($sql);
 		$stmt->execute();
 		$logs = $stmt->fetchAll();
-    	
-    	$this->display('ecommerce/views/dashboard', array(
+		
+			$this->display('ecommerce/views/dashboard', array(
 			'logs' => $logs
 		));
-    }
+		}
 	
 	function _insert_log($message)
 	{
@@ -58,41 +58,41 @@ class EcommerceController extends PluginController {
 	/**
 	 * Documentation
 	 */
-    public function documentation() {
-        $this->display('ecommerce/views/documentation');
-    }
+	public function documentation() {
+		$this->display('ecommerce/views/documentation');
+	}
 	
 	/**
 	 * Settings
 	 */
-    function settings() {
-        $this->display('ecommerce/views/settings');
-    }
-    
-    /**
+	function settings() {
+		$this->display('ecommerce/views/settings');
+	}
+	
+	/**
 	 * Marketing / Promos
 	 */
-    function marketing() {
-        $this->display('ecommerce/views/marketing');
-    }
-    
-    public function get_promo($code) {
-    	global $__FROG_CONN__;
+	function marketing() {
+		$this->display('ecommerce/views/marketing');
+	}
+	
+	public function get_promo($code) {
+		global $__FROG_CONN__;
 		$sql = 'select discount, is_percent from ecommerce_promos where code = \''.mysql_escape_string($code).'\' and curdate() between start_date and end_date limit 0,1';
 		$stmt = $__FROG_CONN__->prepare($sql);
 		$stmt->execute();
 		$promo = $stmt->fetchObject();
 		return $promo;
-    }
-    
-    /**
+	}
+	
+	/**
 	 * Order
 	 */
-    public function order() {
-       $this->order_index();
-    }
-    
-    public function order_index() {
+	public function order() {
+		$this->order_index();
+	}
+	
+	public function order_index() {
 		$page = !empty($_GET['page']) ? $_GET['page']: 1;
 		$keywords = !empty($_GET['keywords']) ? $_GET['keywords']: '';
 		$per_page = 15;
@@ -118,7 +118,7 @@ class EcommerceController extends PluginController {
 			'orders' => $orders,
 			'pagination' => $pagination
 		));
-    }
+	}
 	
 	public function order_show($id) {
 		$order = Record::findByIdFrom('Order', $id);
@@ -154,87 +154,87 @@ class EcommerceController extends PluginController {
 	/**
 	 * Checkout
 	 */
-    public function checkout() {    	
-    	$output = '';
-    	if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-    		$output = $this->_checkout_step_1();
-    	}
-    	else {
-    		//valid helper
-    		include'classes/valid.class.php';
-    		$valid = new Valid();
-    		//validation class
-    		include'classes/validation.class.php';
-    		
-    		$step = $_POST['step'];
-    		
-    		if ($step == '1') {
-    			//step 1 validation
-    			$post = new Validation($_POST['order']);
-    			$post->add_rules('first_name','required');
-    			$post->add_rules('last_name','required');
-    			$post->add_rules('company','required');
-    			$post->add_rules('address','required');
-    			$post->add_rules('city','required');
-    			$post->add_rules('state','required');
+	public function checkout() {		
+		$output = '';
+		if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+			$output = $this->_checkout_step_1();
+		}
+		else {
+			//valid helper
+			include'classes/valid.class.php';
+			$valid = new Valid();
+			//validation class
+			include'classes/validation.class.php';
+			
+			$step = $_POST['step'];
+			
+			if ($step == '1') {
+				//step 1 validation
+				$post = new Validation($_POST['order']);
+				$post->add_rules('first_name','required');
+				$post->add_rules('last_name','required');
+				$post->add_rules('company','required');
+				$post->add_rules('address','required');
+				$post->add_rules('city','required');
+				$post->add_rules('state','required');
 				$post->add_rules('country','required');
-    			$post->add_rules('zip','required');
-    			$post->add_rules('phone','required', array($valid, 'phone'));
-    			$post->add_rules('email', 'required', array($valid, 'email'));
-    			$post->add_rules('rep_name','required');
-    			
-    			if (!isset($_POST['billing_is_shipping'])) {
-    				$post->add_rules('ship_first_name','required');
-	    			$post->add_rules('ship_last_name','required');
-	    			$post->add_rules('ship_company','required');
-	    			$post->add_rules('ship_address','required');
-	    			$post->add_rules('ship_city','required');
-	    			$post->add_rules('ship_state','required');
+				$post->add_rules('zip','required');
+				$post->add_rules('phone','required', array($valid, 'phone'));
+				$post->add_rules('email', 'required', array($valid, 'email'));
+				$post->add_rules('rep_name','required');
+				
+				if (!isset($_POST['billing_is_shipping'])) {
+					$post->add_rules('ship_first_name','required');
+					$post->add_rules('ship_last_name','required');
+					$post->add_rules('ship_company','required');
+					$post->add_rules('ship_address','required');
+					$post->add_rules('ship_city','required');
+					$post->add_rules('ship_state','required');
 					$post->add_rules('ship_country','required');
-	    			$post->add_rules('ship_zip','required');
-	    			$post->add_rules('ship_phone','required', array($valid, 'phone'));
-    			}
-    			
-    			$post->pre_filter('trim');
-    			
-    			//success, go to step 2
-    			if ($post->validate()) {
-    				//save order data
-    				$_SESSION['order'] = $_POST['order'];
-    				$output = $this->_checkout_step_2();
-    			}
-    			//errors, go back to step 1
-    			else {
-    				$errors = $post->errors();
-    				$output = $this->_checkout_step_1($_POST,$errors);
-    			}
-    		}
-    		elseif ($step == '2') {
-    			//step 2 validation
-    			$post = new Validation($_POST['order']);
-    			$post->add_rules('cc_name','required');
-    			$post->add_rules('cc_type','required');
-    			$post->add_rules('cc_number','required', array($valid, 'credit_card'));
-    			$post->add_rules('cc_cvv','required', 'length[3,4]', array($valid, 'digit'));
-    			$post->add_rules('cc_exp_month','required');
-    			$post->add_rules('cc_exp_year','required');
-    			
-    			if(isset($_POST['order']['cc_exp_month']) && isset($_POST['order']['cc_exp_year']))
-    				$post->add_callbacks('cc_exp_year', array($this,'_validate_cc_exp_date'));
-    			
-    			$post->pre_filter('trim');
-    			
-    			if ($post->validate()) {
-    				$cart = new Cart('shopping_cart');
-    				
-    				//order data array
-    				$order_arr = array_merge($_SESSION['order'],$_POST['order']);
-    				$full_cc_number = $order_arr['cc_number'];
-    				$order_arr['cc_number'] = substr($order_arr['cc_number'], -4);
-    				$order_arr['promo_discount'] = $cart->getDiscount($order_arr['promo_code']);
-    				$order_arr['subtotal'] = $cart->getTotal();
-    				$order_arr['tax'] = $cart->getTax();
-    				
+					$post->add_rules('ship_zip','required');
+					$post->add_rules('ship_phone','required', array($valid, 'phone'));
+				}
+				
+				$post->pre_filter('trim');
+				
+				//success, go to step 2
+				if ($post->validate()) {
+					//save order data
+					$_SESSION['order'] = $_POST['order'];
+					$output = $this->_checkout_step_2();
+				}
+				//errors, go back to step 1
+				else {
+					$errors = $post->errors();
+					$output = $this->_checkout_step_1($_POST,$errors);
+				}
+			}
+			elseif ($step == '2') {
+				//step 2 validation
+				$post = new Validation($_POST['order']);
+				$post->add_rules('cc_name','required');
+				$post->add_rules('cc_type','required');
+				$post->add_rules('cc_number','required', array($valid, 'credit_card'));
+				$post->add_rules('cc_cvv','required', 'length[3,4]', array($valid, 'digit'));
+				$post->add_rules('cc_exp_month','required');
+				$post->add_rules('cc_exp_year','required');
+				
+				if(isset($_POST['order']['cc_exp_month']) && isset($_POST['order']['cc_exp_year']))
+					$post->add_callbacks('cc_exp_year', array($this,'_validate_cc_exp_date'));
+				
+				$post->pre_filter('trim');
+				
+				if ($post->validate()) {
+					$cart = new Cart('shopping_cart');
+					
+					//order data array
+					$order_arr = array_merge($_SESSION['order'],$_POST['order']);
+					$full_cc_number = $order_arr['cc_number'];
+					$order_arr['cc_number'] = substr($order_arr['cc_number'], -4);
+					$order_arr['promo_discount'] = $cart->getDiscount($order_arr['promo_code']);
+					$order_arr['subtotal'] = $cart->getTotal();
+					$order_arr['tax'] = $cart->getTax();
+					
 					//process payment
 					include'merchants/firstdata.class.php';
 					$merchant = new FirstData();
@@ -325,17 +325,17 @@ class EcommerceController extends PluginController {
 						unset($_SESSION['order']);
 						unset($_SESSION['Cart']);
 					}
-    			}
-    			//errors, go back to step 2
-    			else {
-    				$errors = $post->errors();
-    				$output = $this->_checkout_step_2($_POST,$errors);
-    			}
-    		}
-    	}
-    		
-    	return $output;
-    }
+				}
+				//errors, go back to step 2
+				else {
+					$errors = $post->errors();
+					$output = $this->_checkout_step_2($_POST,$errors);
+				}
+			}
+		}
+			
+		return $output;
+	}
 	
 	function set_flash($msg,$type) {
 		$output = '<div class="'.$type.'">'.$msg.'</div>';
@@ -347,158 +347,158 @@ class EcommerceController extends PluginController {
 	}
 	
 	// checkout step 1 view
-    function _checkout_step_1($values=null,$errors=null) {
-    	$cart = new Cart('shopping_cart');
-    	
-    	$ship_checked = 'checked="checked"';
-    	if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($values['billing_is_shipping']))
-    		$ship_checked = '';
-    	
-    	$output = '	
+	function _checkout_step_1($values=null,$errors=null) {
+		$cart = new Cart('shopping_cart');
+		
+		$ship_checked = 'checked="checked"';
+		if ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($values['billing_is_shipping']))
+			$ship_checked = '';
+		
+		$output = '	
 		<div id="checkout">
 		<div id="summary"><h3 class="price">$'.number_format($cart->getTotal(),2).'</h3></div>
 		<p id="step">step 1 of 2</p>
 		<form action="" method="post">
 		<input type="hidden" name="step" value="1" />
 		<h3>Billing Information</h3>
-    	
+		
 		<table border="0">
-	    	<tr>
-	    		<td class="label"><label for="first_name">First Name:</label></td>
-	    		<td class="field"><input type="text" name="order[first_name]" size="30" value="'.htmlentities($values['order']['first_name']).'" maxlength="50" /> '.$this->_field_error($errors,'first_name').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="last_name">Last Name:</label></td>
-	    		<td class="field"><input type="text" name="order[last_name]" size="30" value="'.htmlentities($values['order']['last_name']).'" maxlength="50" /> '.$this->_field_error($errors,'last_name').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="company">Company:</label></td>
-	    		<td class="field"><input type="text" name="order[company]" size="30" value="'.htmlentities($values['order']['company']).'" maxlength="50" /> '.$this->_field_error($errors,'company').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="address">Address:</label></td>
-	    		<td class="field"><input type="text" name="order[address]" size="30" value="'.htmlentities($values['order']['address']).'" maxlength="50" /> '.$this->_field_error($errors,'address').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="address2">Address 2:</label></td>
-	    		<td class="field"><input type="text" name="order[address2]" size="30" value="'.htmlentities($values['order']['address2']).'" maxlength="50" /> '.$this->_field_error($errors,'address2').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="city">City:</label></td>
-	    		<td class="field"><input type="text" name="order[city]" size="30" value="'.htmlentities($values['order']['city']).'" maxlength="50" /> '.$this->_field_error($errors,'city').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="state">State:</label></td>
-	    		<td class="field"><select name="order[state]">'.str_replace('value="'.$values['order']['state'].'"','value="'.$values['order']['state'].'" selected="selected"',$this->_state_select()).'</select> '.$this->_field_error($errors,'state').'</td>
-	    	</tr>
+			<tr>
+				<td class="label"><label for="first_name">First Name:</label></td>
+				<td class="field"><input type="text" name="order[first_name]" size="30" value="'.htmlentities($values['order']['first_name']).'" maxlength="50" /> '.$this->_field_error($errors,'first_name').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="last_name">Last Name:</label></td>
+				<td class="field"><input type="text" name="order[last_name]" size="30" value="'.htmlentities($values['order']['last_name']).'" maxlength="50" /> '.$this->_field_error($errors,'last_name').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="company">Company:</label></td>
+				<td class="field"><input type="text" name="order[company]" size="30" value="'.htmlentities($values['order']['company']).'" maxlength="50" /> '.$this->_field_error($errors,'company').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="address">Address:</label></td>
+				<td class="field"><input type="text" name="order[address]" size="30" value="'.htmlentities($values['order']['address']).'" maxlength="50" /> '.$this->_field_error($errors,'address').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="address2">Address 2:</label></td>
+				<td class="field"><input type="text" name="order[address2]" size="30" value="'.htmlentities($values['order']['address2']).'" maxlength="50" /> '.$this->_field_error($errors,'address2').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="city">City:</label></td>
+				<td class="field"><input type="text" name="order[city]" size="30" value="'.htmlentities($values['order']['city']).'" maxlength="50" /> '.$this->_field_error($errors,'city').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="state">State:</label></td>
+				<td class="field"><select name="order[state]">'.str_replace('value="'.$values['order']['state'].'"','value="'.$values['order']['state'].'" selected="selected"',$this->_state_select()).'</select> '.$this->_field_error($errors,'state').'</td>
+			</tr>
 			<tr>
 				<td class="label"><label for="country">Country:</label></td>
 				<td class="field"><input type="text" name="order[country]" size="30" value="'.htmlentities($values['order']['country']).'" maxlength="50" /> '.$this->_field_error($errors,'country').'</td>
 			</tr>
-	    	<tr>
-	    		<td class="label"><label for="zip">Zip:</label></td>
-	    		<td class="field"><input type="text" name="order[zip]" size="30" value="'.htmlentities($values['order']['zip']).'" maxlength="50" /> '.$this->_field_error($errors,'zip').'</td>
-	    	</tr>
-	    	<tr>
-    			<td class="label"><label for="email">Email:</label></td>
-    			<td class="field"><input type="text" name="order[email]" size="30" value="'.htmlentities($values['order']['email']).'" maxlength="50" /> '.$this->_field_error($errors,'email').'</td>
-    		</tr>
-    		<tr>
-    			<td class="label"><label for="phone">Phone:</label></td>
-    			<td class="field"><input type="text" name="order[phone]" size="30" value="'.htmlentities($values['order']['phone']).'" maxlength="50" /> (XXX-XXX-XXXX) '.$this->_field_error($errors,'phone').'</td>
-    		</tr>
-    		<tr>
-    			<td class="label"><label for="fax">Fax:</label></td>
-    			<td class="field"><input type="text" name="order[fax]" size="30" value="'.htmlentities($values['order']['fax']).'" maxlength="50" /> '.$this->_field_error($errors,'fax').'</td>
-    		</tr>
-    		<tr>
-	    		<td class="label"><label for="rep_name">Rep. Name:</label></td>
-	    		<td class="field"><input type="text" name="order[rep_name]" size="30" value="'.htmlentities($values['order']['rep_name']).'" maxlength="50" /> '.$this->_field_error($errors,'rep_name').'</td>
-	    	</tr>
-    	</table>
-    	
-    	<p>
-    		<input type="checkbox" '.$ship_checked.' name="billing_is_shipping" id="shipping-toggle" value="1" /> 
-    		Ship items to the above billing address
-    	</p>
-    	
-    	<h3>Shipping Information</h3>
-    	
-    	<p id="shipping-same" class="notice">Items will be shipped to your billing address.</p>
-    	
-    	<div id="shipping_form" style="display: none;">
-    	<table border="0" id="checkout">
-	    	<tr>
-	    		<td class="label"><label for="ship_first_name">First Name:</label></td>
-	    		<td class="field"><input type="text" name="order[ship_first_name]" size="30" value="'.htmlentities($values['order']['ship_first_name']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_first_name').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="ship_last_name">Last Name:</label></td>
-	    		<td class="field"><input type="text" name="order[ship_last_name]" size="30" value="'.htmlentities($values['order']['ship_last_name']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_last_name').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="ship_company">Company:</label></td>
-	    		<td class="field"><input type="text" name="order[ship_company]" size="30" value="'.htmlentities($values['order']['ship_company']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_company').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="ship_address">Address:</label></td>
-	    		<td class="field"><input type="text" name="order[ship_address]" size="30" value="'.htmlentities($values['order']['ship_address']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_address').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="ship_address2">Address 2:</label></td>
-	    		<td class="field"><input type="text" name="order[ship_address2]" size="30" value="'.htmlentities($values['order']['ship_address2']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_address2').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="ship_city">City:</label></td>
-	    		<td class="field"><input type="text" name="order[ship_city]" size="30" value="'.htmlentities($values['order']['ship_city']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_city').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="ship_state">State:</label></td>
-	    		<td class="field"><select name="order[ship_state]">'.str_replace('value="'.$values['order']['ship_state'].'"','value="'.$values['order']['state'].'" selected="selected"',$this->_state_select()).'</select> '.$this->_field_error($errors,'ship_state').'</td>
-	    	</tr>
+			<tr>
+				<td class="label"><label for="zip">Zip:</label></td>
+				<td class="field"><input type="text" name="order[zip]" size="30" value="'.htmlentities($values['order']['zip']).'" maxlength="50" /> '.$this->_field_error($errors,'zip').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="email">Email:</label></td>
+				<td class="field"><input type="text" name="order[email]" size="30" value="'.htmlentities($values['order']['email']).'" maxlength="50" /> '.$this->_field_error($errors,'email').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="phone">Phone:</label></td>
+				<td class="field"><input type="text" name="order[phone]" size="30" value="'.htmlentities($values['order']['phone']).'" maxlength="50" /> (XXX-XXX-XXXX) '.$this->_field_error($errors,'phone').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="fax">Fax:</label></td>
+				<td class="field"><input type="text" name="order[fax]" size="30" value="'.htmlentities($values['order']['fax']).'" maxlength="50" /> '.$this->_field_error($errors,'fax').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="rep_name">Rep. Name:</label></td>
+				<td class="field"><input type="text" name="order[rep_name]" size="30" value="'.htmlentities($values['order']['rep_name']).'" maxlength="50" /> '.$this->_field_error($errors,'rep_name').'</td>
+			</tr>
+		</table>
+		
+		<p>
+			<input type="checkbox" '.$ship_checked.' name="billing_is_shipping" id="shipping-toggle" value="1" /> 
+			Ship items to the above billing address
+		</p>
+		
+		<h3>Shipping Information</h3>
+		
+		<p id="shipping-same" class="notice">Items will be shipped to your billing address.</p>
+		
+		<div id="shipping_form" style="display: none;">
+		<table border="0" id="checkout">
+			<tr>
+				<td class="label"><label for="ship_first_name">First Name:</label></td>
+				<td class="field"><input type="text" name="order[ship_first_name]" size="30" value="'.htmlentities($values['order']['ship_first_name']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_first_name').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="ship_last_name">Last Name:</label></td>
+				<td class="field"><input type="text" name="order[ship_last_name]" size="30" value="'.htmlentities($values['order']['ship_last_name']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_last_name').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="ship_company">Company:</label></td>
+				<td class="field"><input type="text" name="order[ship_company]" size="30" value="'.htmlentities($values['order']['ship_company']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_company').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="ship_address">Address:</label></td>
+				<td class="field"><input type="text" name="order[ship_address]" size="30" value="'.htmlentities($values['order']['ship_address']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_address').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="ship_address2">Address 2:</label></td>
+				<td class="field"><input type="text" name="order[ship_address2]" size="30" value="'.htmlentities($values['order']['ship_address2']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_address2').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="ship_city">City:</label></td>
+				<td class="field"><input type="text" name="order[ship_city]" size="30" value="'.htmlentities($values['order']['ship_city']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_city').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="ship_state">State:</label></td>
+				<td class="field"><select name="order[ship_state]">'.str_replace('value="'.$values['order']['ship_state'].'"','value="'.$values['order']['state'].'" selected="selected"',$this->_state_select()).'</select> '.$this->_field_error($errors,'ship_state').'</td>
+			</tr>
 			<tr>
 				<td class="label"><label for="ship_country">Country:</label></td>
 				<td class="field"><input type="text" name="order[ship_country]" size="30" value="'.htmlentities($values['order']['ship_country']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_country').'</td>
 			</tr>
-	    	<tr>
-	    		<td class="label"><label for="ship_zip">Zip:</label></td>
-	    		<td class="field"><input type="text" name="order[ship_zip]" size="30" value="'.htmlentities($values['order']['ship_zip']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_zip').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label"><label for="ship_phone">Phone:</label></td>
-	    		<td class="field"><input type="text" name="order[ship_phone]" size="30" value="'.htmlentities($values['order']['ship_phone']).'" maxlength="50" /> (XXX-XXX-XXXX) '.$this->_field_error($errors,'ship_phone').'</td>
-	    	</tr>
-    	</table>
-    	
-    	</div>
-    	
-    	<div id="promo">
-    	<table border="0" id="checkout">
-	    	<tr>
-	    		<td class="label"><label for="promo_code">Promo Code:</label></td>
-	    		<td class="field"><input type="text" name="order[promo_code]" size="25" value="'.htmlentities($values['order']['promo_code']).'" maxlength="25" /> '.$this->_field_error($errors,'promo_code').'</td>
-	    	</tr>
-	    </table>
-	    </div>
-    	
-	    <hr />
-	    
-    	<p>
-    		<input class="button" type="submit" value="Continue to next step" /> or <a href="/products/types">continue shopping</a>
-    	</p>
-    	
-    	</form>
-    	</div>
-	    ';
-	    return $output;
+			<tr>
+				<td class="label"><label for="ship_zip">Zip:</label></td>
+				<td class="field"><input type="text" name="order[ship_zip]" size="30" value="'.htmlentities($values['order']['ship_zip']).'" maxlength="50" /> '.$this->_field_error($errors,'ship_zip').'</td>
+			</tr>
+			<tr>
+				<td class="label"><label for="ship_phone">Phone:</label></td>
+				<td class="field"><input type="text" name="order[ship_phone]" size="30" value="'.htmlentities($values['order']['ship_phone']).'" maxlength="50" /> (XXX-XXX-XXXX) '.$this->_field_error($errors,'ship_phone').'</td>
+			</tr>
+		</table>
+		
+		</div>
+		
+		<div id="promo">
+		<table border="0" id="checkout">
+			<tr>
+				<td class="label"><label for="promo_code">Promo Code:</label></td>
+				<td class="field"><input type="text" name="order[promo_code]" size="25" value="'.htmlentities($values['order']['promo_code']).'" maxlength="25" /> '.$this->_field_error($errors,'promo_code').'</td>
+			</tr>
+		</table>
+		</div>
+		
+		<hr />
+		
+		<p>
+			<input class="button" type="submit" value="Continue to next step" /> or <a href="/products/types">continue shopping</a>
+		</p>
+		
+		</form>
+		</div>
+		';
+		return $output;
 	}
 	
 	//checkout step 2 view
 	function _checkout_step_2($values=null,$errors=null) {
-    	$cart = new Cart('shopping_cart');
-    	
-    	//get promo discount
-    	$discount_text = '';
+		$cart = new Cart('shopping_cart');
+		
+		//get promo discount
+		$discount_text = '';
 		if (isset($_SESSION['order']['promo_code'])) {
 			$discount = $cart->getDiscount($_SESSION['order']['promo_code']);
 			if($discount > 0)
@@ -508,10 +508,10 @@ class EcommerceController extends PluginController {
 			$discount = 0;
 			
 		//get total
-    	$total = number_format(($cart->getTotal()+$cart->getTax())-$discount,2);
-    	
-    	//get taxes
-    	$taxes = number_format($cart->getTax(),2);
+		$total = number_format(($cart->getTotal()+$cart->getTax())-$discount,2);
+		
+		//get taxes
+		$taxes = number_format($cart->getTax(),2);
 		
 		$output = '	
 		<div id="checkout">
@@ -528,68 +528,68 @@ class EcommerceController extends PluginController {
 		<p>Shipping is <strong>FREE</strong></p>
 		
 		<h3>Payment Information</h3>
-    	
+		
 		<table border="0" id="checkout">
-	    	<tr>
-	    		<td class="label" nowrap="1"><label for="cc_name">Name:</label></td>
-	    		<td class="field"><input type="text" name="order[cc_name]" size="30" value="'.htmlentities($values['order']['cc_name']).'" /> '.$this->_field_error($errors,'cc_name').'</td>
-	    	</tr>
 			<tr>
-	    		<td class="label" nowrap="1"><label for="cc_type">Card Type:</label></td>
-	    		<td class="field">
-	    			<select name="order[cc_type]">
-	    				<option value="">-- Select Card --</option>	
-	    				'.str_replace('value="'.$values['order']['cc_type'].'"','value="'.$values['order']['cc_type'].'" selected="selected"',$this->_cc_type_options()).'
+				<td class="label" nowrap="1"><label for="cc_name">Name:</label></td>
+				<td class="field"><input type="text" name="order[cc_name]" size="30" value="'.htmlentities($values['order']['cc_name']).'" /> '.$this->_field_error($errors,'cc_name').'</td>
+			</tr>
+			<tr>
+				<td class="label" nowrap="1"><label for="cc_type">Card Type:</label></td>
+				<td class="field">
+					<select name="order[cc_type]">
+						<option value="">-- Select Card --</option>	
+						'.str_replace('value="'.$values['order']['cc_type'].'"','value="'.$values['order']['cc_type'].'" selected="selected"',$this->_cc_type_options()).'
 					</select> '.$this->_field_error($errors,'cc_type').'
-	    		</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label" nowrap="1"><label for="cc_number">Card Number:</label></td>
-	    		<td class="field"><input type="text" name="order[cc_number]" size="30" value="'.htmlentities($values['order']['cc_number']).'" /> '.$this->_field_error($errors,'cc_number').'</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label" nowrap="1"><label for="cc_cvv">CVV:</label></td>
-	    		<td class="field"><input type="text" name="order[cc_cvv]" size="4" value="'.htmlentities($values['order']['cc_cvv']).'" /> '.$this->_field_error($errors,'cc_cvv').' <a href="javascript:void(0);" onclick="$(\'cvv\').toggle();">what is this?</a>
-	    		
-	    		<div id="cvv" style="display: none;">
-	    			<p>For MasterCard or Visa, it\'s the last three digits in the signature area on the back of your card. For American Express, it\'s the four digits on the front of the card.
-	    		</div>
-	    		
-	    		</td>
-	    	</tr>
-	    	<tr>
-	    		<td class="label" nowrap="1"><label for="cc_exp_month">Expiration Date:</label></td>
-	    		<td class="field">
-	    			<select name="order[cc_exp_month]">
+				</td>
+			</tr>
+			<tr>
+				<td class="label" nowrap="1"><label for="cc_number">Card Number:</label></td>
+				<td class="field"><input type="text" name="order[cc_number]" size="30" value="'.htmlentities($values['order']['cc_number']).'" /> '.$this->_field_error($errors,'cc_number').'</td>
+			</tr>
+			<tr>
+				<td class="label" nowrap="1"><label for="cc_cvv">CVV:</label></td>
+				<td class="field"><input type="text" name="order[cc_cvv]" size="4" value="'.htmlentities($values['order']['cc_cvv']).'" /> '.$this->_field_error($errors,'cc_cvv').' <a href="javascript:void(0);" onclick="$(\'cvv\').toggle();">what is this?</a>
+				
+				<div id="cvv" style="display: none;">
+					<p>For MasterCard or Visa, it\'s the last three digits in the signature area on the back of your card. For American Express, it\'s the four digits on the front of the card.
+				</div>
+				
+				</td>
+			</tr>
+			<tr>
+				<td class="label" nowrap="1"><label for="cc_exp_month">Expiration Date:</label></td>
+				<td class="field">
+					<select name="order[cc_exp_month]">
 						<option value="">-- Month --</option>
-	    				'.str_replace('value="'.$values['order']['cc_exp_month'].'"','value="'.$values['order']['cc_exp_month'].'" selected="selected"',$this->_cc_exp_month_options()).'
+						'.str_replace('value="'.$values['order']['cc_exp_month'].'"','value="'.$values['order']['cc_exp_month'].'" selected="selected"',$this->_cc_exp_month_options()).'
 					</select> '.$this->_field_error($errors,'cc_exp_month').'
 			
 					<select name="order[cc_exp_year]">
 						<option value="">-- Year --</option>	
 						'.str_replace('value="'.$values['order']['cc_exp_year'].'"','value="'.$values['order']['cc_exp_year'].'" selected="selected"',$this->_cc_exp_year_options()).'
 					</select> '.$this->_field_error($errors,'cc_exp_year').'
-	    		</td>
-	    	</tr>
-	    </table>
-    	
-	    <hr />
-	    
-    	<p>
-    		<input class="button" type="submit" value="Complete my purchase" /> or 
-    		<a href="/products/types">cancel, and continue shopping</a>
-    	</p>
-    	
-    	</form>
-    	</div>
-	    ';
-    	return $output;
-    }
-    
-    function _send_order_email($to_email,$order_id,$order_arr,$variant_arr) {
-    	require_once('Mail.php');
-    	
-    	$subject = 'eMed America Online Order #'.$order_id;
+				</td>
+			</tr>
+		</table>
+		
+		<hr />
+		
+		<p>
+			<input class="button" type="submit" value="Complete my purchase" /> or 
+			<a href="/products/types">cancel, and continue shopping</a>
+		</p>
+		
+		</form>
+		</div>
+		';
+		return $output;
+	}
+	
+	function _send_order_email($to_email,$order_id,$order_arr,$variant_arr) {
+		require_once('Mail.php');
+		
+		$subject = 'eMed America Online Order #'.$order_id;
 		$headers = "From: info@emedamerica.com\r\nReply-To: info@emedamerica.com";
 		
 		$msg_line = "-------------------------------------------\r\n";
@@ -665,23 +665,23 @@ class EcommerceController extends PluginController {
 			return true;
 		else
 			return false;
-    }
-    
-    function _validate_cc_exp_date(Validation $array, $field) {
-    	if ((int)$_POST['order']['cc_exp_month'] < date('m') && (int)$_POST['order']['cc_exp_year'] <= date('Y')) {
-    		$array->add_error($field, 'expired_card');
-    	}
-    }
-    
-    function _field_error($errors,$field_name) {
-    	if(isset($errors[$field_name]))
-    		return '<span class="field_error">'.$this->_error_message($errors[$field_name]).'</span>';
-    	else
-    		return null;
-    }
-    
-    function _error_message($error) {
-    	$messages = array
+	}
+	
+	function _validate_cc_exp_date(Validation $array, $field) {
+		if ((int)$_POST['order']['cc_exp_month'] < date('m') && (int)$_POST['order']['cc_exp_year'] <= date('Y')) {
+			$array->add_error($field, 'expired_card');
+		}
+	}
+	
+	function _field_error($errors,$field_name) {
+		if(isset($errors[$field_name]))
+			return '<span class="field_error">'.$this->_error_message($errors[$field_name]).'</span>';
+		else
+			return null;
+	}
+	
+	function _error_message($error) {
+		$messages = array
 		(
 			'required' => 'Field cannot be blank.',
 			'alpha' => 'Only alphabetic characters are allowed.',
@@ -694,7 +694,7 @@ class EcommerceController extends PluginController {
 		);
 		
 		return $messages[$error];
-    }
+	}
 	
 	function _state_select() {
 		$output = '
@@ -789,29 +789,29 @@ class EcommerceController extends PluginController {
 			
 		return $output;
 	}
-    
-    /**
+	
+	/**
 	 * Product
 	 */
-    public function product() {
-       $this->product_index();
-    }
-    
-    public function product_index() {
-    	$page = !empty($_GET['page']) ? $_GET['page']: 1;
-    	$keywords = !empty($_GET['keywords']) ? $_GET['keywords']: '';
-    	$per_page = 15;
-    	
+	public function product() {
+	  $this->product_index();
+	}
+	
+	public function product_index() {
+		$page = !empty($_GET['page']) ? $_GET['page']: 1;
+		$keywords = !empty($_GET['keywords']) ? $_GET['keywords']: '';
+		$per_page = 15;
+		
 		$products_total = Product::find(array(
 			'where' => 'title like \'%'.$keywords.'%\''
 		));
-    	$products = Product::find(array(
+		$products = Product::find(array(
 			'limit' => $per_page,
 			'offset' => ($page-1)*($per_page),
 			'where' => 'title like \'%'.$keywords.'%\''
 		));
-    	
-    	$pagination = new Pagination(array(
+		
+		$pagination = new Pagination(array(
 			'base_url' => URL_PUBLIC.'/'.ADMIN_DIR.'/plugin/ecommerce/product/?keywords='.$keywords.'&page=',
 			'total_rows' => count($products_total),
 			'per_page' => $per_page,
@@ -823,205 +823,206 @@ class EcommerceController extends PluginController {
 			'products' => $products,
 			'pagination' => $pagination
 		));
-    }
-    
+	}
+	
 	// TODO: set product parent page id in a setting set vendor and type parent id's dynamically
-    public function product_create()
-    {
-        if (get_request_method() == 'POST')
+	public function product_create()
+	{
+	   if (get_request_method() == 'POST')
 		{
-	    	//get new type id if a new one was created
-	    	if ($_POST['product_type']['title']) {
+			//get new type id if a new one was created
+			if ($_POST['product_type']['title']) {
 				//save type
-		    	$type_id = $this->_product_save(null,'product_type','ProductType');
-		    	$_POST['product']['type_id'] = $type_id;
+				$type_id = $this->_product_save(null,'product_type','ProductType');
+				$_POST['product']['type_id'] = $type_id;
 
 				//add new type page
 				$page_data = array("is_protected"=>1,"parent_id"=>87,"title"=>$_POST['product_type']['title'],"slug"=>$_POST['product_type']['slug'],"breadcrumb"=>$_POST['product_type']['title']);
-		    	$page = new Page($page_data);
+				$page = new Page($page_data);
 				$page->save();
-		    }
-	    	
-	    	//get new vendor id if a new one was created
-	    	if ($_POST['product_vendor']['title']) {
-	    		//save vendor
+			}
+			
+			//get new vendor id if a new one was created
+			if ($_POST['product_vendor']['title']) {
+				//save vendor
 				$vendor_id = $this->_product_save(null,'product_vendor','ProductVendor');
-	    		$_POST['product']['vendor_id'] = $vendor_id;
+				$_POST['product']['vendor_id'] = $vendor_id;
 	
 				//add new vendor page
 				$page_data = array("is_protected"=>1,"parent_id"=>86,"title"=>$_POST['product_vendor']['title'],"slug"=>$_POST['product_vendor']['slug'],"breadcrumb"=>$_POST['product_vendor']['title']);
-		    	$page = new Page($page_data);
+				$page = new Page($page_data);
 				$page->save();
-	    	}
-	    	
-	    	//create new page
-	    	//TODO: set product parent page id in a setting
-	    	$page_data = array("is_protected"=>1,"parent_id"=>9,"title"=>$_POST['product']['title'],"slug"=>$_POST['product']['slug'],"breadcrumb"=>$_POST['product']['title']);
-	    	$page = new Page($page_data);
-	    	if ($page->save()) {
-	    		//get page id
-	    		$_POST['product']['page_id'] = $page->id;
-	    	}
-	    	
-	    	//save product
-	    	$product_id = $this->_product_save(null,'product','Product');
-	    	
-	    	//save product variant
-	    	$_POST['product_variant']['product_id'] = $product_id;
-	    	$this->_product_save(null,'product_variant','Product');
-	    	
-	    	//save images
-	    	if (isset($_SESSION['product_images'])) {
-	    		$this->_images_save($product_id,$_SESSION['product_images']);
-	    		unset($_SESSION['product_images']);
-	    	}
-	    	
-	    	//add log entry
-	    	$this->_insert_log('New product: <a href="'.get_url('plugin/ecommerce/product_update/'.$product_id).'">'.$_POST['product']['title'].'</a>');
-	    	
-	    	redirect(get_url('plugin/ecommerce/product'));
-	    }
-	    
-	    //pass types and vendors for select boxes
-	    $types = ProductType::findAll();
-	    $vendors = ProductVendor::findAll();
-	    
-        $this->display('ecommerce/views/products/create', array(
-            'action'  => 'create',
-            'types' => $types,
-            'vendors' => $vendors
-        ));
-    }
-    
-    public function product_update($id=null)
-    {
-    	if (is_null($id))
-            redirect(get_url('plugin/ecommerce'));
-            
-        if ( ! $product = Product::findById($id))
-        {
-            Flash::set('error', __('Product not found!'));
-            redirect(get_url('plugin/ecommerce'));
-        }
-        
-        if (get_request_method() == 'POST') {
-            //get new type id if a new one was created
-	    	if ($_POST['product_type']['title']) {
+			}
+			
+			//create new page
+			//TODO: set product parent page id in a setting
+			$page_data = array("is_protected"=>1,"parent_id"=>9,"title"=>$_POST['product']['title'],"slug"=>$_POST['product']['slug'],"breadcrumb"=>$_POST['product']['title']);
+			$page = new Page($page_data);
+			if ($page->save()) {
+				//get page id
+				$_POST['product']['page_id'] = $page->id;
+			}
+			
+			//save product
+			$product_id = $this->_product_save(null,'product','Product');
+			
+			//save product variant
+			$_POST['product_variant']['product_id'] = $product_id;
+			$this->_product_save(null,'product_variant','Product');
+			
+			//save images
+			if (isset($_SESSION['product_images'])) {
+				$this->_images_save($product_id,$_SESSION['product_images']);
+				unset($_SESSION['product_images']);
+			}
+			
+			//add log entry
+			$this->_insert_log('New product: <a href="'.get_url('plugin/ecommerce/product_update/'.$product_id).'">'.$_POST['product']['title'].'</a>');
+			
+			redirect(get_url('plugin/ecommerce/product'));
+		}
+		
+		//pass types and vendors for select boxes
+		$types = ProductType::findAll();
+		$vendors = ProductVendor::findAll();
+		
+		$this->display('ecommerce/views/products/create', array(
+			'action'  => 'create',
+			'types' => $types,
+			'vendors' => $vendors
+		));
+	}
+	
+	public function product_update($id=null)
+	{
+		if (is_null($id))
+			redirect(get_url('plugin/ecommerce'));
+		  
+		if ( ! $product = Product::findById($id))
+		{
+			Flash::set('error', __('Product not found!'));
+			redirect(get_url('plugin/ecommerce'));
+		}
+	   
+		if (get_request_method() == 'POST') {
+			//get new type id if a new one was created
+			if ($_POST['product_type']['title']) {
 				//save type
-		    	$type_id = $this->_product_save(null,'product_type','ProductType');
-		    	$_POST['product']['type_id'] = $type_id;
+				$type_id = $this->_product_save(null,'product_type','ProductType');
+				$_POST['product']['type_id'] = $type_id;
 		
 				//add new type page
 				$page_data = array("is_protected"=>1,"parent_id"=>87,"title"=>$_POST['product_type']['title'],"slug"=>$_POST['product_type']['slug'],"breadcrumb"=>$_POST['product_type']['title']);
-		    	$page = new Page($page_data);
+				$page = new Page($page_data);
 				$page->save();
-		    }
-	    	
-	    	//get new vendor id if a new one was created
-	    	if ($_POST['product_vendor']['title']) {
-	    		//save vendor
+			}
+			
+			//get new vendor id if a new one was created
+			if ($_POST['product_vendor']['title']) {
+				//save vendor
 				$vendor_id = $this->_product_save(null,'product_vendor','ProductVendor');
-	    		$_POST['product']['vendor_id'] = $vendor_id;
+				$_POST['product']['vendor_id'] = $vendor_id;
 	
 				//add new vendor page
 				$page_data = array("is_protected"=>1,"parent_id"=>86,"title"=>$_POST['product_vendor']['title'],"slug"=>$_POST['product_vendor']['slug'],"breadcrumb"=>$_POST['product_vendor']['title']);
-		    	$page = new Page($page_data);
+				$page = new Page($page_data);
 				$page->save();
-	    	}
-	    	
-	    	//save product
-	    	$product_id = $this->_product_save($id,'product','Product');
-	    	
-	    	//insert log
-	    	$this->_insert_log('Product <a href="'.get_url('plugin/ecommerce/product_update/'.$product_id).'">'.$_POST['product']['title'].'</a> was updated.');
-	    	
-	    	//save images
-	    	if (isset($_SESSION['product_images']))
-	    		$this->_images_save($product_id,$_SESSION['product_images']);
-	    	
-	    	//save product page
-	    	$product = Product::findById($id);
-		    if ($product) {
-		    	$page = Record::findByIdFrom('Page', $product->page_id);
-		    	$page_data = array("is_protected"=>1,"title"=>$_POST['product']['title'],"slug"=>$_POST['product']['slug'],"breadcrumb"=>$_POST['product']['title'],"created_on_time"=>null,"published_on_time"=>null);
-		    	$page->setFromData($page_data);
-		    	$page->save();
-		    }
-            
-            redirect(get_url('plugin/ecommerce/product'));
-        }
-        
-	    $types = ProductType::findAll();
-	    $vendors = ProductVendor::findAll();
-	    $images = Record::findAllFrom('ProductImage', 'product_id=? order by position', array($id));
-	    $variants = Record::findAllFrom('ProductVariant', 'product_id=? order by position', array($id));
+			}
+			
+			//save product
+			$product_id = $this->_product_save($id,'product','Product');
+			
+			//insert log
+			$this->_insert_log('Product <a href="'.get_url('plugin/ecommerce/product_update/'.$product_id).'">'.$_POST['product']['title'].'</a> was updated.');
+			
+			//save images
+			if (isset($_SESSION['product_images']))
+				$this->_images_save($product_id,$_SESSION['product_images']);
+			
+			//save product page
+			$product = Product::findById($id);
+			if ($product) {
+				$page = Record::findByIdFrom('Page', $product->page_id);
+				$page_data = array("is_protected"=>1,"title"=>$_POST['product']['title'],"slug"=>$_POST['product']['slug'],"breadcrumb"=>$_POST['product']['title'],"created_on_time"=>null,"published_on_time"=>null);
+				$page->setFromData($page_data);
+				$page->save();
+			}
+		  
+			redirect(get_url('plugin/ecommerce/product'));
+		}
+	   
+		$types = ProductType::findAll();
+		$vendors = ProductVendor::findAll();
+		$images = Record::findAllFrom('ProductImage', 'product_id=? order by position', array($id));
+		$variants = Record::findAllFrom('ProductVariant', 'product_id=? order by position', array($id));
 		$files = Record::findAllFrom('ProductFile', 'product_id=? order by position', array($id));
 		$videos = Record::findAllFrom('ProductVideo', 'product_id=? order by position', array($id));
-        
-        $this->display('ecommerce/views/products/update', array(
-            'action'  => 'update',
-            'product' => $product,
-            'types' => $types,
-            'vendors' => $vendors,
-            'images' => $images,
-            'variants' => $variants,
+	   
+		$this->display('ecommerce/views/products/update', array(
+			'action'  => 'update',
+			'product' => $product,
+			'types' => $types,
+			'vendors' => $vendors,
+			'images' => $images,
+			'variants' => $variants,
 			'files' => $files,
 			'videos' => $videos
-        ));
-    }
-    
-    public function product_delete($id)
-    {
-        if ($product = Record::findByIdFrom('Product', $id))
-        {
-        	$product_title = $product->title;
-        	
-        	//delete page for product
-        	if ($page = Record::findByIdFrom('Page', $product->page_id))
-            	$page->delete();
-            
-            //delete variants
-            Record::deleteWhere('ecommerce_product_variant', 'product_id=?', array($id));
-            
-            //delete images
-            Record::deleteWhere('ecommerce_product_image', 'product_id=?', array($id));
-            
-            //delete files
-            Record::deleteWhere('ecommerce_product_file', 'product_id=?', array($id));
-            
-            //delete videos
-            Record::deleteWhere('ecommerce_product_video', 'product_id=?', array($id));
-        	
-            if ($product->delete()) {
-            	//add log entry
-	    		$this->_insert_log('Product \''.$product_title.'\' was deleted.');
-	    		
-                Flash::set('success', __('Product has been deleted!'));
-            }
-            else
-                Flash::set('error', __('Product has not been deleted!'));
-        }
-        else Flash::set('error', __('Product not found!'));
-        
-        redirect(get_url('plugin/ecommerce/product'));
-    }
-    
-    public function product_show($slug) {
-    	$output = '';
-    	$product = Product::findBySlug($slug);
-    	$images = ProductImage::findByProduct($slug);
-    	$variants = ProductVariant::findByProduct($slug);
-    	$files = ProductFile::findByProduct($slug);
-    	$videos = ProductVideo::findByProduct($slug);
-    	$related_products = $this->products_related($slug);
-    	
-    	if ($product) {
-    		$output = '<div id="product_images">';
-    		
-    		if ($images) {
-	    		foreach ($images as $image) : 
-	    			$output .= '<img src="/public/ecommerce/images/products/'.$image->filename.'" />';
-	    		endforeach;
+		));
+	}
+	
+	public function product_delete($id)
+	{
+		if ($product = Record::findByIdFrom('Product', $id))
+		{
+			$product_title = $product->title;
+	   	
+			//delete page for product
+			if ($page = Record::findByIdFrom('Page', $product->page_id))
+				$page->delete();
+		  
+			//delete variants
+			Record::deleteWhere('ecommerce_product_variant', 'product_id=?', array($id));
+		  
+			//delete images
+			Record::deleteWhere('ecommerce_product_image', 'product_id=?', array($id));
+		  
+			//delete files
+			Record::deleteWhere('ecommerce_product_file', 'product_id=?', array($id));
+		  
+			//delete videos
+			Record::deleteWhere('ecommerce_product_video', 'product_id=?', array($id));
+	   	
+			if ($product->delete()) {
+				//add log entry
+				$this->_insert_log('Product \''.$product_title.'\' was deleted.');
+				
+				Flash::set('success', __('Product has been deleted!'));
+			}
+			else
+				Flash::set('error', __('Product has not been deleted!'));
+		}
+		else
+			Flash::set('error', __('Product not found!'));
+
+		redirect(get_url('plugin/ecommerce/product'));
+	}
+	
+	public function product_show($slug) {
+		$output = '';
+		$product = Product::findBySlug($slug);
+		$images = ProductImage::findByProduct($slug);
+		$variants = ProductVariant::findByProduct($slug);
+		$files = ProductFile::findByProduct($slug);
+		$videos = ProductVideo::findByProduct($slug);
+		$related_products = $this->products_related($slug);
+		
+		if ($product) {
+			$output = '<div id="product_images">';
+			
+			if ($images) {
+				foreach ($images as $image) : 
+					$output .= '<img src="/public/ecommerce/images/products/'.$image->filename.'" />';
+				endforeach;
 			}
 			
 			if ($variants) {
@@ -1061,56 +1062,56 @@ class EcommerceController extends PluginController {
 			
 			$output .= '</div>';
 			
-    		$output .= $product->description;
-    		
-    		if ($related_products) {
-    			$output .= '<br clear="all"><h3>Related Products</h3>';
-    			$output .= $this->products_related($slug);
-    		}
-    	}
-    	
-    	return $output;
-    }
-    
-    public function products_related($slug) {
-    	$product = Product::findBySlug($slug);
-    	if (!empty($product->tags)) {
-    		$products = Product::findRelated($product->tags,$slug);
-    		if ($products)
-    			return $this->_product_grid($products);
-    		else
-    			return null;
-    	}
-    	else
-    		return null;
-    }
-    
-    public function products_by_type($slug) {
-    	$page = isset($_GET['page']) ? $_GET['page']: 1;
-    	$per_page = 16;
+			$output .= $product->description;
+			
+			if ($related_products) {
+				$output .= '<br clear="all"><h3>Related Products</h3>';
+				$output .= $this->products_related($slug);
+			}
+		}
 		
-    	$products_total = Product::findByTypeSlug(null,$slug);
+		return $output;
+	}
+	
+	public function products_related($slug) {
+		$product = Product::findBySlug($slug);
+		if (!empty($product->tags)) {
+			$products = Product::findRelated($product->tags,$slug);
+			if ($products)
+				return $this->_product_grid($products);
+			else
+				return null;
+		}
+		else
+			return null;
+	}
+	
+	public function products_by_type($slug) {
+		$page = isset($_GET['page']) ? $_GET['page']: 1;
+		$per_page = 16;
+		
+		$products_total = Product::findByTypeSlug(null,$slug);
 		$products = Product::findByTypeSlug(array(
 			'limit' => $per_page,
 			'offset' => ($page-1)*($per_page)
 		),$slug);
 		
-    	return $this->_product_grid($products,$products_total,$page,$per_page);
-    }
-    
-    public function products_by_vendor($slug) {
-    	$page = !empty($_GET['page']) ? $_GET['page']: 1;
-    	$per_page = 16;
+		return $this->_product_grid($products,$products_total,$page,$per_page);
+	}
+	
+	public function products_by_vendor($slug) {
+		$page = !empty($_GET['page']) ? $_GET['page']: 1;
+		$per_page = 16;
 		
-    	$products_total = Product::findByVendorSlug(null,$slug);
+		$products_total = Product::findByVendorSlug(null,$slug);
 		$products = Product::findByVendorSlug(array(
 			'limit' => $per_page,
 			'offset' => ($page-1)*($per_page)
 		),$slug);
 		
-    	return $this->_product_grid($products,$products_total,$page,$per_page);
-    }
-    
+		return $this->_product_grid($products,$products_total,$page,$per_page);
+	}
+	
 	public function products_search($keywords) {
 		$page = isset($_GET['page']) ? $_GET['page']: 1;
 		$per_page = 16;
@@ -1127,27 +1128,27 @@ class EcommerceController extends PluginController {
 		return $this->_product_grid($products,$products_total,$page,$per_page,$keywords);
 	}
 	
-    public function products_all() {
+	public function products_all() {
 		$page = isset($_GET['page']) ? $_GET['page']: 1;
-    	$per_page = 16;
+		$per_page = 16;
 		
-    	$products_total = Product::findAll();
+		$products_total = Product::findAll();
 		$products = Product::findAll(array(
 			'limit' => $per_page,
 			'offset' => ($page-1)*($per_page)
 		));
 		
-    	return $this->_product_grid($products,$products_total,$page,$per_page);
-    }
-    
-    public function product_types_nav() {
-    	$output = '';
-    	$types = ProductType::nav();
-    	
-    	$output .= '<table class="ecommerce types">';
+		return $this->_product_grid($products,$products_total,$page,$per_page);
+	}
+	
+	public function product_types_nav() {
+		$output = '';
+		$types = ProductType::nav();
 		
-    	$i = 0;
-    	$col_num = 4;
+		$output .= '<table class="ecommerce types">';
+		
+		$i = 0;
+		$col_num = 4;
 		foreach($types as $type) :
 			if ($type->title != 'Bio-Medwash') {
 				if ($i % $col_num == 0) {
@@ -1172,17 +1173,17 @@ class EcommerceController extends PluginController {
 		}
 		
 		$output .= '</tr></table>';
-    	
-    	return $output;
-    }
+		
+		return $output;
+	}
 	
 	
-    
-    public function get_cart_product($variant_id) {
-    	$product = Product::getCartProduct($variant_id);
-    	return $product;
-    }
-    
+	
+	public function get_cart_product($variant_id) {
+		$product = Product::getCartProduct($variant_id);
+		return $product;
+	}
+	
 	function _product_grid($products,$products_total=null,$page=null,$per_page=null,$keywords=null) {
 		$output = '';
 		$pages_output = '';
@@ -1210,39 +1211,39 @@ class EcommerceController extends PluginController {
 			$col_num = 4;
 			$output .= '<table class="ecommerce">';
 			
-    		foreach($products as $product) :
-    			if ($i % $col_num == 0) {
-    				if ($i > 1)
-    					$output .= '</tr>';
-    				$output .= '<tr>';
-    			}
-    			
-    			$output .= '<td>';
-    			if ($product->image)
-    				$output .= '<a href="/products/'.$product->slug.'"><img src="/public/ecommerce/images/products/'.str_replace('.','_tn.',$product->image).'" width="100" /></a><br />';
-    			$output .= '<a href="/products/'.$product->slug.'">'.$product->title.'</a><br />';
+			foreach($products as $product) :
+				if ($i % $col_num == 0) {
+					if ($i > 1)
+						$output .= '</tr>';
+					$output .= '<tr>';
+				}
+				
+				$output .= '<td>';
+				if ($product->image)
+					$output .= '<a href="/products/'.$product->slug.'"><img src="/public/ecommerce/images/products/'.str_replace('.','_tn.',$product->image).'" width="100" /></a><br />';
+				$output .= '<a href="/products/'.$product->slug.'">'.$product->title.'</a><br />';
 				if ($product->price > 0)
 					$output .= '$'.number_format($product->price,2);
-    			
-    			//$output .= '<br /><a class="more" href="/products/'.$product->slug.'">More Info &raquo;</a>';
-    			$output .= '</td>';
-    			$i++;
-    		endforeach;
-    		
-    		while($i % $col_num != 0) {
+				
+				//$output .= '<br /><a class="more" href="/products/'.$product->slug.'">More Info &raquo;</a>';
+				$output .= '</td>';
+				$i++;
+			endforeach;
+			
+			while($i % $col_num != 0) {
 				$output .= '<td>&nbsp;</td>';
 				$i++;
 			}
-    		
-    		$output .= '</tr></table>';
-    	}
+			
+			$output .= '</tr></table>';
+		}
 		
 		$output = $pages_output . $output . $pages_output;
-    	
+		
 		if (empty($output))
 			$output = '<p>There are no products to display.</p>';
 		
-    	return $output;
+		return $output;
 	}
 	
 	function _product_save($id=null,$model,$model_name)
@@ -1272,13 +1273,13 @@ class EcommerceController extends PluginController {
 		else
 			return Record::lastInsertId();
 	}
-    
-    /**
+	
+	/**
 	 * Collections
 	 */
-    public function collection() {
-       $this->collection_index();
-    }
+	public function collection() {
+	  $this->collection_index();
+	}
 	
 	public function collection_index()
 	{
@@ -1306,7 +1307,7 @@ class EcommerceController extends PluginController {
 	}
 
 	public function collection_create()
-	{        
+	{	   
 		if (get_request_method() == 'POST') {
 			$collection_id = $this->_collection_save(null,'collection','Collection');
 
@@ -1483,12 +1484,12 @@ class EcommerceController extends PluginController {
 		else
 			return Record::lastInsertId();
 	}
-    
-    /**
+	
+	/**
 	 * Images
 	 */
-    public function image_upload($id) {
-    	$uploaddir = '/home/admin/public_html/yoursite/public/ecommerce/images/products/';
+	public function image_upload($id) {
+		$uploaddir = '/home/admin/public_html/yoursite/public/ecommerce/images/products/';
 		$uploadfile = $uploaddir . basename($_FILES['product_image']['name']);
 		
 		if (move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadfile)) {
@@ -1504,12 +1505,12 @@ class EcommerceController extends PluginController {
 		}
 		else
 			echo "error";
-    }
-    
-    public function image_reorder()
-    {
-    	global $__FROG_CONN__;
-    	parse_str($_POST['data']);
+	}
+	
+	public function image_reorder()
+	{
+		global $__FROG_CONN__;
+		parse_str($_POST['data']);
 		for ($i = 0; $i < count($product_images); $i++) {
 			$pos = $i+1;
 			$sql = 'update ecommerce_product_image set position = '.$pos.' where id = '.$product_images[$i].';';
@@ -1518,23 +1519,23 @@ class EcommerceController extends PluginController {
 			if ($stmt)
 				echo 'success'.$i;
 		}
-    }
-    
-    public function image_delete($id)
-    {
-        if ($image = Record::findByIdFrom('ProductImage', $id))
-        	$image->delete();
-    }
-    
-    public function image_html($id) {
-    	$record = Record::findByIdFrom('ProductImage', $id);
+	}
+	
+	public function image_delete($id)
+	{
+	   if ($image = Record::findByIdFrom('ProductImage', $id))
+	   	$image->delete();
+	}
+	
+	public function image_html($id) {
+		$record = Record::findByIdFrom('ProductImage', $id);
 		if ($record) {
 			echo '<div class="sorting" id="image_'.$id.'">
 				<img src="/public/ecommerce/images/products/'.str_replace('.','_tn.',$record->filename).'" width="100" height="100" /><br />
 				<a class="delete" href="#" onclick="image_delete('.$id.');return false;">Delete</a>
 			</div>';
 		}
-    }
+	}
 	
 	function _images_save($product_id,$images)
 	{
@@ -1600,26 +1601,26 @@ class EcommerceController extends PluginController {
 		imagedestroy($dst_img); 
 		imagedestroy($src_img); 
 	}
-    
-    /**
+	
+	/**
 	 * Variants
 	 */
-    public function variant_create() {
+	public function variant_create() {
 		$record = Record::insert('ecommerce_product_variant', $_POST['product_variant']);
 		echo Record::lastInsertId();
-    }
-    
-    public function variant_update($id) {    	
-    	$record = Record::findByIdFrom('ProductVariant', $id);
+	}
+	
+	public function variant_update($id) {		
+		$record = Record::findByIdFrom('ProductVariant', $id);
 		$record->setFromData($_POST['product_variant']);
 		if ($record->save())
 			echo 'success';
-    }
-    
-    public function variant_reorder()
-    {
-    	global $__FROG_CONN__;
-    	parse_str($_POST['data']);
+	}
+	
+	public function variant_reorder()
+	{
+		global $__FROG_CONN__;
+		parse_str($_POST['data']);
 		for ($i = 0; $i < count($product_variants); $i++) {
 			$pos = $i+1;
 			$sql = 'update ecommerce_product_variant set position = '.$pos.' where id = '.$product_variants[$i].';';
@@ -1628,16 +1629,16 @@ class EcommerceController extends PluginController {
 			if ($stmt)
 				echo 'success'.$i;
 		}
-    }
-    
-    public function variant_delete($id)
-    {
-        if ($variant = Record::findByIdFrom('ProductVariant', $id))
-        	$variant->delete();
-    }
-    
-    public function variant_info_html($id) {
-    	$record = Record::findByIdFrom('ProductVariant', $id);
+	}
+	
+	public function variant_delete($id)
+	{
+		if ($variant = Record::findByIdFrom('ProductVariant', $id))
+			$variant->delete();
+	}
+	
+	public function variant_info_html($id) {
+		$record = Record::findByIdFrom('ProductVariant', $id);
 		if ($record) {
 			echo '<div id="variant_'.$id.'">
 				<div class="tools" style="display: none;">
@@ -1666,10 +1667,10 @@ class EcommerceController extends PluginController {
 			new ToolBox(\'variant_'.$id.'\');
 			</script>';
 		}
-    }
-    
-    public function variant_form_html($id) {
-    	$record = Record::findByIdFrom('ProductVariant', $id);
+	}
+	
+	public function variant_form_html($id) {
+		$record = Record::findByIdFrom('ProductVariant', $id);
 		if ($record) {
 			echo '<div id="variant_form_'.$id.'" class="form" style="display: none;">
 				<form method="post" action="/'.ADMIN_DIR.'/plugin/ecommerce/variant_update/'.$id.'" onsubmit="variant_update('.$id.');return false;">
@@ -1708,27 +1709,27 @@ class EcommerceController extends PluginController {
 				</form>
 			</div>';
 		}
-    }
+	}
 
 	/**
 	 * Files
 	 */
-    public function file_create() {
+	public function file_create() {
 		$record = Record::insert('ecommerce_product_file', $_POST['product_file']);
 		echo Record::lastInsertId();
-    }
-    
-    public function file_update($id) {    	
-    	$record = Record::findByIdFrom('ProductFile', $id);
+	}
+	
+	public function file_update($id) {		
+		$record = Record::findByIdFrom('ProductFile', $id);
 		$record->setFromData($_POST['product_file']);
 		if ($record->save())
 			echo 'success';
-    }
-    
-    public function file_reorder()
-    {
-    	global $__FROG_CONN__;
-    	parse_str($_POST['data']);
+	}
+	
+	public function file_reorder()
+	{
+		global $__FROG_CONN__;
+		parse_str($_POST['data']);
 		for ($i = 0; $i < count($product_files); $i++) {
 			$pos = $i+1;
 			$sql = 'update ecommerce_product_file set position = '.$pos.' where id = '.$product_files[$i].';';
@@ -1737,16 +1738,16 @@ class EcommerceController extends PluginController {
 			if ($stmt)
 				echo 'success'.$i;
 		}
-    }
-    
-    public function file_delete($id)
-    {
-        if ($file = Record::findByIdFrom('ProductFile', $id))
-        	$file->delete();
-    }
-    
-    public function file_info_html($id) {
-    	$record = Record::findByIdFrom('ProductFile', $id);
+	}
+	
+	public function file_delete($id)
+	{
+		if ($file = Record::findByIdFrom('ProductFile', $id))
+			$file->delete();
+	}
+	
+	public function file_info_html($id) {
+		$record = Record::findByIdFrom('ProductFile', $id);
 		if ($record) {
 			echo '<div id="file_'.$id.'">
 				<div class="tools" style="display: none;">
@@ -1760,10 +1761,10 @@ class EcommerceController extends PluginController {
 			new ToolBox(\'file_'.$id.'\');
 			</script>';
 		}
-    }
-    
-    public function file_form_html($id) {
-    	$record = Record::findByIdFrom('ProductFile', $id);
+	}
+	
+	public function file_form_html($id) {
+		$record = Record::findByIdFrom('ProductFile', $id);
 		if ($record) {
 			echo '<div id="file_form_'.$id.'" class="form" style="display: none;">
 				<form method="post" action="/'.ADMIN_DIR.'/plugin/ecommerce/file_update/'.$id.'" onsubmit="file_update('.$id.');return false;">
@@ -1784,27 +1785,27 @@ class EcommerceController extends PluginController {
 				</form>
 			</div>';
 		}
-    }
-    
-    /**
+	}
+	
+	/**
 	 * Videos
 	 */
-    public function video_create() {
+	public function video_create() {
 		$record = Record::insert('ecommerce_product_video', $_POST['product_video']);
 		echo Record::lastInsertId();
-    }
-    
-    public function video_update($id) {    	
-    	$record = Record::findByIdFrom('ProductVideo', $id);
+	}
+	
+	public function video_update($id) {		
+		$record = Record::findByIdFrom('ProductVideo', $id);
 		$record->setFromData($_POST['product_video']);
 		if ($record->save())
 			echo 'success';
-    }
-    
-    public function video_reorder()
-    {
-    	global $__FROG_CONN__;
-    	parse_str($_POST['data']);
+	}
+	
+	public function video_reorder()
+	{
+		global $__FROG_CONN__;
+		parse_str($_POST['data']);
 		for ($i = 0; $i < count($product_videos); $i++) {
 			$pos = $i+1;
 			$sql = 'update ecommerce_product_video set position = '.$pos.' where id = '.$product_videos[$i].';';
@@ -1813,16 +1814,16 @@ class EcommerceController extends PluginController {
 			if ($stmt)
 				echo 'success'.$i;
 		}
-    }
-    
-    public function video_delete($id)
-    {
-        if ($video = Record::findByIdFrom('ProductVideo', $id))
-        	$video->delete();
-    }
-    
-    public function video_info_html($id) {
-    	$record = Record::findByIdFrom('ProductVideo', $id);
+	}
+	
+	public function video_delete($id)
+	{
+		if ($video = Record::findByIdFrom('ProductVideo', $id))
+			$video->delete();
+	}
+	
+	public function video_info_html($id) {
+		$record = Record::findByIdFrom('ProductVideo', $id);
 		if ($record) {
 			echo '<div id="video_'.$id.'">
 				<div class="tools" style="display: none;">
@@ -1836,10 +1837,10 @@ class EcommerceController extends PluginController {
 			new ToolBox(\'video_'.$id.'\');
 			</script>';
 		}
-    }
-    
-    public function video_form_html($id) {
-    	$record = Record::findByIdFrom('ProductVideo', $id);
+	}
+	
+	public function video_form_html($id) {
+		$record = Record::findByIdFrom('ProductVideo', $id);
 		if ($record) {
 			echo '<div id="video_form_'.$id.'" class="form" style="display: none;">
 				<form method="post" action="/'.ADMIN_DIR.'/plugin/ecommerce/video_update/'.$id.'" onsubmit="video_update('.$id.');return false;">
@@ -1860,5 +1861,5 @@ class EcommerceController extends PluginController {
 				</form>
 			</div>';
 		}
-    }
+	}
 } // end EcommerceController
