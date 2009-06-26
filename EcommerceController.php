@@ -181,7 +181,6 @@ class EcommerceController extends PluginController {
 				$post->add_rules('zip','required');
 				$post->add_rules('phone','required', array($valid, 'phone'));
 				$post->add_rules('email', 'required', array($valid, 'email'));
-				$post->add_rules('rep_name','required');
 				
 				if (!isset($_POST['billing_is_shipping'])) {
 					$post->add_rules('ship_first_name','required');
@@ -411,10 +410,6 @@ class EcommerceController extends PluginController {
 				<td class="label"><label for="fax">Fax:</label></td>
 				<td class="field"><input type="text" name="order[fax]" size="30" value="'.htmlentities($values['order']['fax']).'" maxlength="50" /> '.$this->_field_error($errors,'fax').'</td>
 			</tr>
-			<tr>
-				<td class="label"><label for="rep_name">Rep. Name:</label></td>
-				<td class="field"><input type="text" name="order[rep_name]" size="30" value="'.htmlentities($values['order']['rep_name']).'" maxlength="50" /> '.$this->_field_error($errors,'rep_name').'</td>
-			</tr>
 		</table>
 		
 		<p>
@@ -626,8 +621,6 @@ class EcommerceController extends PluginController {
 		$total = ($subtotal + $shipping + $tax) - $discount;
 		
 		$msg .= "\r\n".$msg_line."Payment Information\r\n".$msg_line;
-		
-		$msg .= "Rep. Name: ".$order_arr['rep_name']."\r\n\r\n";
 		
 		$msg .= "Card Name: ".$order_arr['cc_name']."\r\n";
 		$msg .= "Card Type: ".$order_arr['cc_type']."\r\n";

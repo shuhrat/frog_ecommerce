@@ -52,7 +52,6 @@ if ($driver == mysql)
 			subtotal decimal(10,2) NOT NULL,
 			shipping decimal(10,2) NOT NULL,
 			tax decimal(10,2) NOT NULL,
-			rep_name varchar(50) NOT NULL,
 			promo_code varchar(25) NOT NULL,
 			promo_discount decimal(10,2) NOT NULL,
 			cc_name varchar(50) NOT NULL,
