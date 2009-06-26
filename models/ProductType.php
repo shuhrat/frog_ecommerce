@@ -59,7 +59,7 @@ class ProductType extends Record
 	public static function nav()
 	{		
 		//$sql = 'select distinct t.title, t.slug, (select i.filename from ecommerce_product_image i inner join ecommerce_product p on i.product_id = p.id where p.type_id = t.id order by p.title,i.position limit 0,1) as image from ecommerce_product_type t group by t.title order by t.title';
-		$sql = 'select title, slug, image from ecommerce_product_type order by title';
+		$sql = 'select title, slug from ecommerce_product_type order by title';
 		$stmt = self::$__CONN__->prepare($sql);
 		$stmt->execute();
 		

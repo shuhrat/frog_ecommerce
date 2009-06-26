@@ -1150,21 +1150,16 @@ class EcommerceController extends PluginController {
 		$i = 0;
 		$col_num = 4;
 		foreach($types as $type) :
-			if ($type->title != 'Bio-Medwash') {
-				if ($i % $col_num == 0) {
-					if ($i > 1) {
-						$output .= '</tr>';
-						$i = 0;
-					}
-					$output .= '<tr>';
+			if ($i % $col_num == 0) {
+				if ($i > 1) {
+					$output .= '</tr>';
+					$i = 0;
 				}
-	
-				$output .= '<td><a href="/products/types/'.$type->slug.'">'.$type->title.'<br />';
-				if ($type->image)
-					$output .= '<img src="'.$type->image.'" width="94" /></a><br /><br />';
-					$output .= '<a href="/products/types/'.$type->slug.'" class="shop">Shop Now</a></td>';
-				$i++;
+				$output .= '<tr>';
 			}
+
+			$output .= '<td><a href="/products/types/'.$type->slug.'">'.$type->title.'</a></td>';
+			$i++;
 		endforeach;
 		
 		while($i%$col_num != 0) {
